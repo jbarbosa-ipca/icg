@@ -1,0 +1,145 @@
+<style type="text/css" media="screen">
+  .guia-cypher h3 { margin-top: 0; }
+  .guia-cypher .pergunta { font-weight: 600; margin: 14px 0 4px; }
+  .guia-cypher pre.code { white-space: pre-wrap; }
+  .guia-cypher .nota { font-size: 0.9em; opacity: 0.8; }
+</style>
+<article class="guide guia-cypher">
+<carousel class="deck container-fluid">
+
+  <!-- Introdução -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Exemplos de Cypher</h3>
+      <p class="lead">Neo4j – Jorge Barbosa, 2026</p>
+      <p>Neste guia vamos praticar as cláusulas Cypher com exemplos:</p>
+      <ol>
+        <li>Criar, consultar, contar e remover um nó</li>
+        <li>Criar um pequeno modelo de vendas (clientes, vendedores e produtos)</li>
+        <li>Consultas simples sobre o modelo</li>
+        <li>Consultas que percorrem relações</li>
+        <li>Desafio e respetivas soluções</li>
+      </ol>
+      <p class="nota">Clica num bloco de código para o copiar para o editor e depois carrega em ▶ (ou Ctrl+Enter) para o executar.</p>
+    </div>
+  </slide>
+
+  <!-- Slide 16 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Exemplos: um nó</h3>
+
+      <p class="pergunta">Criar um nó:</p>
+      <pre class="pre-scrollable code runnable">CREATE ({Nome: "Pedro"})</pre>
+
+      <p class="pergunta">Consultar o nó criado (três formas equivalentes):</p>
+      <pre class="pre-scrollable code runnable">MATCH (n {Nome: "Pedro"}) RETURN n</pre>
+      <pre class="pre-scrollable code runnable">MATCH (n WHERE n.Nome = "Pedro") RETURN n</pre>
+      <pre class="pre-scrollable code runnable">MATCH (n) WHERE n.Nome = "Pedro" RETURN n</pre>
+
+      <p class="pergunta">Quantos nós temos:</p>
+      <pre class="pre-scrollable code runnable">MATCH (n) RETURN COUNT(n) AS count</pre>
+
+      <p class="pergunta">Remover um nó:</p>
+      <pre class="pre-scrollable code runnable">MATCH (n {Nome: "Pedro"}) DELETE n</pre>
+
+      <p class="pergunta">Remover tudo (com relações):</p>
+      <pre class="pre-scrollable code runnable">MATCH (n) DETACH DELETE n</pre>
+    </div>
+  </slide>
+
+  <!-- Slide 17 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Exemplos: criar nós e relações</h3>
+      <p>Executa este bloco <b>uma única vez</b> (é uma só query). Se o executares de novo, os nós ficam duplicados — nesse caso limpa a base de dados com <code>MATCH (n) DETACH DELETE n</code> e volta a criar.</p>
+      <pre class="pre-scrollable code runnable">CREATE (c1:Cliente{Nome: "Maria", Id: 1})
+CREATE (c2:Cliente{Nome: "João", Id: 2})
+CREATE (c3:Cliente{Nome: "Cris", Id: 3})
+CREATE (v1:Vendedor{Nome: "Matias", Id: 1})
+CREATE (v2:Vendedor{Nome: "Julieta", Id: 2})
+CREATE (p1:Produto{Nome: "Sapato", Id: 1})
+CREATE (p2:Produto{Nome: "Camisa", Id: 2})
+CREATE (p3:Produto{Nome: "Bolsa", Id: 3})
+CREATE (c1)-[r1:COMPROU {Quantidade: 2}]-&gt;(p1)
+CREATE (c1)-[r2:COMPROU {Quantidade: 2}]-&gt;(p2)
+CREATE (c2)-[r3:COMPROU {Quantidade: 2}]-&gt;(p1)
+CREATE (c3)-[r4:COMPROU {Quantidade: 2}]-&gt;(p1)
+CREATE (c3)-[r5:COMPROU {Quantidade: 2}]-&gt;(p2)
+CREATE (c3)-[r6:COMPROU {Quantidade: 2}]-&gt;(p3)
+CREATE (v1)-[r7:VENDEU_PARA]-&gt;(c1)
+CREATE (v1)-[r8:VENDEU_PARA]-&gt;(c3)
+CREATE (v2)-[r9:VENDEU_PARA]-&gt;(c2)</pre>
+
+      <p class="pergunta">Ver o grafo completo:</p>
+      <pre class="pre-scrollable code runnable">MATCH (n) RETURN n</pre>
+    </div>
+  </slide>
+
+  <!-- Slide 18 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Exemplos: consultas simples</h3>
+
+      <p class="pergunta">Quantos produtos temos?</p>
+      <pre class="pre-scrollable code runnable">MATCH (n:Produto) RETURN COUNT(n) AS `Total de Produtos`</pre>
+
+      <p class="pergunta">Quantos clientes temos?</p>
+      <pre class="pre-scrollable code runnable">MATCH (n:Cliente) RETURN COUNT(n) AS NumClientes</pre>
+
+      <p class="pergunta">Quem são os nossos clientes?</p>
+      <pre class="pre-scrollable code runnable">MATCH (n:Cliente) RETURN n</pre>
+    </div>
+  </slide>
+
+  <!-- Slide 19 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Exemplos: consultas com relações</h3>
+
+      <p class="pergunta">Quais são os produtos que o cliente com o Id = 1 comprou?</p>
+      <pre class="pre-scrollable code runnable">MATCH (c:Cliente {Id: 1}), (p:Produto) RETURN *</pre>
+
+      <p class="pergunta">Quem é que comprou a camisa?</p>
+      <pre class="pre-scrollable code runnable">MATCH (c)-[:COMPROU]-&gt;(p:Produto {Nome: "Camisa"}) RETURN c</pre>
+
+      <p class="pergunta">Quais são os produtos mais vendidos?</p>
+      <pre class="pre-scrollable code runnable">MATCH (c)-[r:COMPROU]-&gt;(p) RETURN p.Nome ORDER BY r.Quantidade DESC LIMIT 1</pre>
+    </div>
+  </slide>
+
+  <!-- Slide 20 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Desafio</h3>
+      <p>Tenta escrever a query para cada pergunta antes de avançar para as soluções.</p>
+
+      <p class="pergunta">Qual é o vendedor com mais clientes?</p>
+      <p class="pergunta">Qual o vendedor que vendeu mais produtos?</p>
+      <p class="pergunta">Qual é o outro produto que devemos oferecer ao João?</p>
+    </div>
+  </slide>
+
+  <!-- Slide 21 -->
+  <slide class="row-fluid">
+    <div class="col-sm-12">
+      <h3>Soluções</h3>
+
+      <p class="pergunta">Qual é o vendedor com mais clientes?</p>
+      <pre class="pre-scrollable code runnable">MATCH (v)-[:VENDEU_PARA]-&gt;(cliente)
+RETURN v.Nome AS Nome_Vendedor, count(v.Nome) AS Total_Clientes
+ORDER BY Total_Clientes DESC LIMIT 1</pre>
+
+      <p class="pergunta">Qual o vendedor que vendeu mais produtos?</p>
+      <pre class="pre-scrollable code runnable">MATCH (vendedor:Vendedor)-[:VENDEU_PARA]-&gt;()-[c:COMPROU]-&gt;()
+RETURN vendedor.Nome AS Nome_Vendedor, SUM(c.Quantidade) AS Produtos_Vendidos
+ORDER BY Produtos_Vendidos DESC LIMIT 1</pre>
+
+      <p class="pergunta">Qual é o outro produto que devemos oferecer ao João?</p>
+      <pre class="pre-scrollable code runnable">MATCH (:Cliente{Nome:"João"})-[:COMPROU]-&gt;(mesmos_produtos)&lt;-[:COMPROU]-(clientes)-[:COMPROU]-&gt;(produtos_diferentes)
+RETURN produtos_diferentes.Nome</pre>
+    </div>
+  </slide>
+
+</carousel>
+</article>
