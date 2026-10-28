@@ -1,0 +1,316 @@
+<article class="guide">
+<carousel class="deck container-fluid">
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>Ficha 04 extra</h3>
+    <p class="lead">MATCH e WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>25 exerc&#237;cios em duas partes: primeiro s&#243; <code>MATCH</code>, depois <code>MATCH</code> com <code>WHERE</code>. Todas as queries terminam em <code>RETURN</code>, porque o Cypher o exige.</p>
+    <p>As solu&#231;&#245;es est&#227;o num guia &#224; parte, no &#250;ltimo slide.</p>
+    <p>Se a base j&#225; tiver dados, limpa-a primeiro (apaga tudo):</p>
+    <pre mode="cypher" class="pre-scrollable code runnable">MATCH (n) DETACH DELETE n</pre>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>Dados de teste</h3>
+    <p class="lead">Corre isto uma vez</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Cria 5 pessoas, 2 empresas, 3 projetos, 3 tecnologias e as rela&#231;&#245;es entre eles. Clica no bloco para o copiar para o editor e carrega em Ctrl+Enter.</p>
+    <pre mode="cypher" class="pre-scrollable code runnable">CREATE
+ (ana:Pessoa {nome:&#x27;Ana&#x27;, idade:29, cidade:&#x27;Braga&#x27;}),
+ (bruno:Pessoa {nome:&#x27;Bruno&#x27;, idade:35, cidade:&#x27;Porto&#x27;}),
+ (carla:Pessoa {nome:&#x27;Carla&#x27;, idade:41, cidade:&#x27;Lisboa&#x27;}),
+ (diogo:Pessoa {nome:&#x27;Diogo&#x27;, idade:24, cidade:&#x27;Braga&#x27;}),
+ (eva:Pessoa {nome:&#x27;Eva&#x27;, idade:32, cidade:&#x27;Porto&#x27;}),
+ (tn:Empresa {nome:&#x27;TechNorte&#x27;, setor:&#x27;Software&#x27;}),
+ (ld:Empresa {nome:&#x27;LisboaData&#x27;, setor:&#x27;Dados&#x27;}),
+ (p1:Projeto {nome:&#x27;Fatura&#231;&#227;o&#x27;, orcamento:50000}),
+ (p2:Projeto {nome:&#x27;Dashboard&#x27;, orcamento:20000}),
+ (p3:Projeto {nome:&#x27;Migra&#231;&#227;o Cloud&#x27;, orcamento:120000}),
+ (php:Tecnologia {nome:&#x27;PHP&#x27;}),
+ (py:Tecnologia {nome:&#x27;Python&#x27;}),
+ (aws:Tecnologia {nome:&#x27;AWS&#x27;}),
+ (ana)-[:TRABALHA_EM {desde:2020}]-&gt;(tn),
+ (bruno)-[:TRABALHA_EM {desde:2015}]-&gt;(tn),
+ (diogo)-[:TRABALHA_EM {desde:2023}]-&gt;(tn),
+ (carla)-[:TRABALHA_EM {desde:2012}]-&gt;(ld),
+ (eva)-[:TRABALHA_EM {desde:2019}]-&gt;(ld),
+ (ana)-[:CONHECE]-&gt;(bruno),
+ (bruno)-[:CONHECE]-&gt;(carla),
+ (carla)-[:CONHECE]-&gt;(eva),
+ (diogo)-[:CONHECE]-&gt;(ana),
+ (ana)-[:PARTICIPA_EM {funcao:&#x27;Developer&#x27;}]-&gt;(p1),
+ (bruno)-[:PARTICIPA_EM {funcao:&#x27;L&#237;der&#x27;}]-&gt;(p1),
+ (diogo)-[:PARTICIPA_EM {funcao:&#x27;Developer&#x27;}]-&gt;(p2),
+ (carla)-[:PARTICIPA_EM {funcao:&#x27;L&#237;der&#x27;}]-&gt;(p3),
+ (eva)-[:PARTICIPA_EM {funcao:&#x27;Developer&#x27;}]-&gt;(p3),
+ (bruno)-[:PARTICIPA_EM {funcao:&#x27;Consultor&#x27;}]-&gt;(p3),
+ (p1)-[:USA]-&gt;(php), (p1)-[:USA]-&gt;(aws),
+ (p2)-[:USA]-&gt;(py),
+ (p3)-[:USA]-&gt;(aws), (p3)-[:USA]-&gt;(py),
+ (tn)-[:DESENVOLVE]-&gt;(p1), (tn)-[:DESENVOLVE]-&gt;(p2),
+ (ld)-[:DESENVOLVE]-&gt;(p3)</pre>
+    <p>Para ver o modelo do grafo:</p>
+    <pre mode="cypher" class="pre-scrollable code runnable">CALL db.schema.visualization()</pre>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>Parte A</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Nesta parte s&#243; podes usar <code>MATCH</code> e <code>RETURN</code>. Para filtrar, coloca propriedades dentro do pr&#243;prio padr&#227;o, por exemplo <code>(p:Pessoa {nome:'Ana'})</code>.</p>
+    <p>Etiquetas: <code>:Pessoa</code>, <code>:Empresa</code>, <code>:Projeto</code>, <code>:Tecnologia</code>.</p>
+    <p>Rela&#231;&#245;es: <code>TRABALHA_EM</code>, <code>CONHECE</code>, <code>PARTICIPA_EM</code>, <code>USA</code>, <code>DESENVOLVE</code>.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A1</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Devolve todos os n&#243;s do grafo.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A2</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Devolve todas as pessoas.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A3</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Devolve o nome e a cidade de cada pessoa.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A4</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Encontra a pessoa chamada Ana, usando propriedades dentro do padr&#227;o.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A5</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Lista cada pessoa e a empresa onde trabalha.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A6</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Lista as pessoas que trabalham na TechNorte.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A7</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Lista todas as rela&#231;&#245;es: n&#243; de origem, tipo da rela&#231;&#227;o e n&#243; de destino.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A8</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Que tecnologias usa o projeto &#8220;Migra&#231;&#227;o Cloud&#8221;?</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A9</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Quem s&#227;o os &#8220;amigos de amigos&#8221; da Ana (dois saltos de CONHECE)?</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A10</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Que pessoas participam em projetos que usam AWS?</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A11</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Que fun&#231;&#227;o tem cada pessoa no projeto &#8220;Fatura&#231;&#227;o&#8221;?</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>A12</h3>
+    <p class="lead">S&#243; MATCH</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Que pessoas o Diogo consegue alcan&#231;ar por CONHECE em 1 a 3 saltos?</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>Parte B</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Agora filtra com <code>WHERE</code>. Operadores &#250;teis: <code>=</code>, <code>&lt;&gt;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>AND</code>, <code>OR</code>, <code>NOT</code>, <code>IN</code>, <code>STARTS WITH</code>, <code>ENDS WITH</code> e <code>CONTAINS</code>.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B1</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas com mais de 30 anos.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B2</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas que vivem em Braga ou no Porto. Resolve de duas maneiras: com OR e com IN.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B3</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas com idade entre 25 e 35, inclusive.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B4</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas cujo nome come&#231;a por &#8220;B&#8221;.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B5</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas cujo nome termina em &#8220;a&#8221;.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B6</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Projetos com or&#231;amento superior a 30 000.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B7</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas que trabalham na empresa desde antes de 2020.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B8</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas que n&#227;o vivem em Braga.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B9</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>L&#237;deres de projetos com or&#231;amento acima de 40 000.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B10</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Colegas da Ana (mesma empresa), excluindo a pr&#243;pria Ana.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B11</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pares de pessoas que se conhecem mas vivem em cidades diferentes.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B12</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas que participam como Developer em projetos com or&#231;amento inferior a 100 000.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>B13</h3>
+    <p class="lead">MATCH + WHERE</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Pessoas com menos de 35 anos que participam em projetos que usam Python.</p>
+  </div>
+</slide>
+<slide class="row-fluid">
+  <div class="col-sm-3">
+    <h3>Solu&#231;&#245;es</h3>
+    <p class="lead">Quando acabares</p>
+  </div>
+  <div class="col-sm-9">
+    <p>Abre o guia das solu&#231;&#245;es:</p>
+    <pre mode="cypher" class="pre-scrollable code runnable">:play http://localhost:8001/ficha04-extra-solucoes.html</pre>
+  </div>
+</slide>
+</carousel>
+</article>
